@@ -1,0 +1,152 @@
+<?php
+
+$module_path = drupal_get_path('module', 'rtm_mail');
+
+include($module_path . '/rtm_mail.sql.inc');
+
+
+
+function rtm_mail_perm() {
+   return array('access rtm_mail');
+}
+
+function rtm_mail_menu() {
+   $items = array();
+
+   $items['mail/broadcast'] = array (
+      'page callback' => '_rtm_mail_display_form',
+      'type' => MENU_CALLBACK,
+      'access arguments' => array('access rtm_mail'),
+   );
+
+   return $items;
+}
+
+function _rtm_mail_display_form() {
+   return drupal_get_form('_rtm_mail_message_form');
+}
+
+function _rtm_mail_message_form() {
+   global $user;
+
+   $options = array();
+   foreach(_rtm_mail_get_roles() as $role) {
+      $options[$role->rid] = $role->name . 's';
+   }
+
+   $form = array();
+
+  $form['#submit'] = array('_rtm_mail_submit');
+
+  $form['from'] = array('#type' => 'item',
+    '#title' => t('From'),
+    '#value' => theme('username', $user) .' &lt;'. check_plain($user->mail) .'&gt;',
+  );
+
+
+    $form['to_addr'] = array(
+   '#type' => 'select',
+    '#title' => 'Send To',
+    '#options' => $options,
+    '#multiple' => FALSE,
+    '#description' => 'Select the recipients of this message'
+    );
+
+    $form['subject'] = array('#type' => 'textfield',
+      '#title' => t('Subject'),
+      '#maxlength' => 255,
+      '#required' => TRUE,
+    );
+
+    $form['message'] = array('#type' => 'textarea',
+      '#title' => t('Message'),
+      '#required' => TRUE,
+    );
+
+    $form['post_msg'] = array(
+        '#type' => 'checkbox',
+	'#title' => 'Post this message to the web site',
+	'#value' => TRUE
+    );
+
+    if ($user->uid) {
+      $form['copy'] = array('#type' => 'checkbox',
+        '#title' => t('Send yourself a copy.'),
+      );
+    }
+    else {
+      $form['copy'] = array('#type' => 'value', '#value' => FALSE);
+    }
+    $form['submit'] = array('#type' => 'submit',
+      '#value' => t('Send e-mail'),
+    );
+
+    return $form;
+}
+
+function _rtm_mail_submit($form, &$form_state) {
+  global $user;
+  $addrs = _rtm_mail_get_addresses($form_state);
+  $params['msg_text'] = $form_state['values']['message'];
+  $params['subject'] = $form_state['values']['subject'];
+  $count = 0;
+
+  foreach ($addrs as $addr) {
+     $count++;
+     if (strlen($addr->value) > 0) {
+      drupal_mail('rtm_mail', 'testing', $addr->value, language_default(), $params, $user->mail, TRUE);
+     } else {
+      drupal_mail('rtm_mail', 'testing', $addr->mail, language_default(), $params, $user->mail, TRUE);
+     }
+  }
+
+  if ($form_state['values']['copy'] == 1) {
+     $count++;
+     drupal_mail('rtm_mail', 'testing', $user->mail, language_default(), $params, $user->mail, TRUE);
+  } 
+  drupal_set_message($count . " E-Mails Sent.");
+
+  if ($form_state['values']['post_msg'] == 1) {
+    $node =  new StdClass();
+    $node->type = 'announcement';
+    $node->title = $form_state['values']['subject'];
+    $node->body = $form_state['values']['message'];
+    $node->teaser = $form_state['values']['message'];
+    $node->uid = $user->uid;
+    $node->name = $user->name;
+    $node->status = 1;
+    $node->promote = 1;
+    node_save($node);
+    drupal_set_message("Message Posted to the Front Page.");
+
+  }
+}
+
+
+function rtm_mail_mail($key, &$message, $params) {
+   $message['subject'] = "[RTM] " . $params['subject'];
+   $message['body'][] = $params['msg_text'];
+}
+
+
+
+
+
+
+
+/*
+  $out = "<ul>";
+  foreach ($addrs as $addr) {
+     $out .= "<li>" . $addr->name;
+     if (strlen($addr->value) > 0) {
+        $out .= ", " . $addr->value . "*</li>";
+     } else {
+        $out .= ", " . $addr->mail . "</li>";
+     }
+  }
+
+  $out .= "</ul>";
+  print $out;
+  print "<pre>".print_r($form_state)."</pre>";
+*/
+?>
