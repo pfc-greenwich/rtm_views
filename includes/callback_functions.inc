@@ -179,17 +179,20 @@ function _rtm_views_members_delegate() {
 
     if (!isset($_POST['json'])) {
        watchdog('rtm_views','json not posted', NULL);
+       drupal_set_header($_SERVER['SERVER_PROTOCOL'] . ' 406 Not Acceptable');
        return;
     }
     $obj = json_decode($_POST['json']);
 
     if (!isset($obj->uid)) {
        watchdog('rtm_views','uid not set', NULL);
+       drupal_set_header($_SERVER['SERVER_PROTOCOL'] . ' 406 Not Acceptable');
        return;
     }
 
     if (!isset($obj->nid)) {
        watchdog('rtm_views','nid not set', NULL);
+       drupal_set_header($_SERVER['SERVER_PROTOCOL'] . ' 406 Not Acceptable');
        return;
     }
 //  file_put_contents("/tmp/drupal.debug", "_rtm_views_members_delegate() nid=".$obj->nid." uid=".$obj->uid."\n\n", FILE_APPEND);
@@ -204,8 +207,11 @@ function _rtm_views_members_delegate() {
 //  file_put_contents("/tmp/drupal.debug", "_rtm_views_members_delegate() node=: ".print_r($node, TRUE), FILE_APPEND);
     if ($node->nid) {
        drupal_set_message("delegate update called ... ".$obj->uid." into ".$obj->nid);
+    } else {
+       drupal_set_header($_SERVER['SERVER_PROTOCOL'] . ' 406 Not Acceptable');
+       return;
     }
-    drupal_goto("/edit/committee/delegates");
+    drupal_set_header($_SERVER['SERVER_PROTOCOL'] . ' 200 OK');
 }
 
 ?>

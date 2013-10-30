@@ -10,6 +10,15 @@
 function rtm_views_menu() {
    $items = array();
 
+   $items['admin/settings/rtm_views'] = array(
+     'title' => 'RTM Configuration settings',
+     'description' => 'Configuration for Scantron Card printing',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('rtm_views_admin'),
+     'access arguments' => array('configure settings'),
+     'type' => MENU_NORMAL_ITEM,
+   );
+
    $items['export/gwt/rtm-cmte-list'] = array (
       'page callback' => '_rtm_views_committee_list',
       'type' => MENU_CALLBACK,

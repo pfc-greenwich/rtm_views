@@ -8,6 +8,7 @@ include($module_path . '/includes/menu_callbacks.inc');
 include($module_path . '/includes/callback_functions.inc');
 include($module_path . '/includes/print_mail_form_handling.inc');
 include($module_path . '/includes/theme.inc');
+include($module_path . '/includes/configuration.inc');
 
 function rtm_views_perm() {
   return array('update rtm committees');
