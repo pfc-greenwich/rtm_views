@@ -111,7 +111,7 @@ function _rtm_views_committee_members($committee_name = NULL) {
 
 function _rtm_views_members_add() {
 
-    file_put_contents("/tmp/drupal.debug", "_rtm_views_members_add(): ".print_r($_POST, TRUE), FILE_APPEND);
+//  file_put_contents("/tmp/drupal.debug", "_rtm_views_members_add(): ".print_r($_POST, TRUE), FILE_APPEND);
 
     if (!isset($_POST['json'])) {
        watchdog('rtm_views','json not posted', NULL);
