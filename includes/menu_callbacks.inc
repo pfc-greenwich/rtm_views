@@ -46,6 +46,13 @@ function rtm_views_menu() {
       'access arguments' => array('access content'),
    );
 
+   $items['export/gwt/officers/%/%'] = array (
+      'page callback' => '_rtm_views_officers_info',
+      'page arguments' => array(3,4),
+      'type' => MENU_CALLBACK,
+      'access arguments' => array('access content'),
+   );
+
 /**
  * These items allow for updating RTM committees, hence the permissions
 **/

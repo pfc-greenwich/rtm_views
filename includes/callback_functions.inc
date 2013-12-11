@@ -30,7 +30,6 @@ function _rtm_views_members($search = NULL) {
   die;
 }
 
-
 function _rtm_views_members_info($search = NULL, $parm = NULL) {
 
   if (!isset($search)) {
@@ -64,6 +63,7 @@ function _rtm_views_members_info($search = NULL, $parm = NULL) {
 //print_r($items);
   die;
 }
+
 
 
 
@@ -212,6 +212,58 @@ function _rtm_views_members_delegate() {
        return;
     }
     drupal_set_header($_SERVER['SERVER_PROTOCOL'] . ' 200 OK');
+}
+
+/*
+select o.nid,o.vid,field_cmte_member_uid,field_cmte_value,field_office_value from rtm_content_field_office o, rtm_content_field_cmte_member m,rtm_content_field_cmte c where m.nid=o.nid and m.vid=o.vid and m.nid=c.nid and m.vid=c.vid;
+
+
+select o.nid,o.vid,field_cmte_member_uid,field_district_value,field_office_value from rtm_content_field_office o, rtm_content_field_cmte_member m,rtm_content_field_district c where m.nid=o.nid and m.vid=o.vid and m.nid=c.nid and m.vid=c.vid;
+*/
+
+function _rtm_views_officers_info($search = NULL, $parm = NULL) {
+
+  if (!isset($search)) {
+     return;
+  }
+
+  if (!isset($parm)) {
+     return;
+  }
+
+  $sql = "select o.nid as nid,field_cmte_member_uid as uid,field_office_value as office from rtm_content_field_office o, rtm_content_field_cmte_member m,";
+
+  if ($search == "c") {
+     $sql .= "rtm_content_field_cmte c ";
+     $sql .= "where m.nid=o.nid and m.vid=o.vid and m.nid=c.nid and m.vid=c.vid and field_cmte_value = '$parm' order by nid";
+  } elseif ($search == "d") {
+     $sql .= "rtm_content_field_district c ";
+     $sql .= "where m.nid=o.nid and m.vid=o.vid and m.nid=c.nid and m.vid=c.vid and field_district_value = '$parm' order by nid";
+  } else {
+     die;
+  }
+
+
+  $result = db_query($sql);
+
+  $items = array();
+  while ($row = db_fetch_object($result)) {
+#    $row->realname = str_replace("\\"","'", $row->realname);
+#    $row->realname = str_replace("\'","'", $row->realname);
+     array_push($items, $row);
+  }
+
+  $obj = new stdClass();
+  $obj->matches = $items;
+
+//$json = drupal_to_js($result->fetchAll());
+  header("Content-Type: application/json");
+  print $_GET["callback"];
+  print "(";
+  print json_encode($obj);
+  print ");";
+//print_r($items);
+  die;
 }
 
 ?>
