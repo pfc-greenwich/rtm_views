@@ -65,12 +65,6 @@ function _rtm_views_members_info($search = NULL, $parm = NULL) {
 }
 
 
-
-
-
-
-
-
 function _rtm_views_committee_list() {
 
   $result = db_query("select distinct(c.field_cmte_value) from {content_field_cmte} c, {node} n where n.type='rtm_committee' and c.vid=n.vid order by c.field_cmte_value");
@@ -83,6 +77,25 @@ function _rtm_views_committee_list() {
   print $json;
   die;
 }
+
+
+function _rtm_views_standing_committee_list() {
+
+  $result = db_query("select distinct(c.field_cmte_value) from {content_field_cmte} c, {node} n where n.type='standing_cmte' and c.vid=n.vid order by c.field_cmte_value");
+
+  $items = array();
+  while ($row = db_fetch_array($result))
+     array_push($items, $row['field_cmte_value']);
+
+  $json = json_encode($items);
+  print $json;
+  die;
+}
+
+
+
+
+
 
 
 function _rtm_views_committee_members($committee_name = NULL) {
@@ -206,7 +219,7 @@ function _rtm_views_members_delegate() {
     node_save($node);
 //  file_put_contents("/tmp/drupal.debug", "_rtm_views_members_delegate() node=: ".print_r($node, TRUE), FILE_APPEND);
     if ($node->nid) {
-       drupal_set_message("delegate update called ... ".$obj->uid." into ".$obj->nid);
+//     drupal_set_message("delegate update called ... ".$obj->uid." into ".$obj->nid);
     } else {
        drupal_set_header($_SERVER['SERVER_PROTOCOL'] . ' 406 Not Acceptable');
        return;
@@ -219,30 +232,41 @@ select o.nid,o.vid,field_cmte_member_uid,field_cmte_value,field_office_value fro
 
 
 select o.nid,o.vid,field_cmte_member_uid,field_district_value,field_office_value from rtm_content_field_office o, rtm_content_field_cmte_member m,rtm_content_field_district c where m.nid=o.nid and m.vid=o.vid and m.nid=c.nid and m.vid=c.vid;
+
+select o.nid, r.realname,field_office_value from rtm_content_field_cmte c,rtm_content_field_office o,rtm_content_field_cmte_member m left join rtm_realname r on r.uid=m.field_cmte_member_uid where c.field_cmte_value='Appointments' and c.vid=o.vid and c.vid=m.vid order by nid;
 */
 
-function _rtm_views_officers_info($search = NULL, $parm = NULL) {
+function _rtm_views_officers_info() {
 
-  if (!isset($search)) {
-     return;
-  }
+    if (!isset($_POST['json'])) {
+       watchdog('rtm_views','json not posted', NULL);
+       return;
+    }
+    $obj = json_decode($_POST['json']);
 
-  if (!isset($parm)) {
-     return;
-  }
+    if (!isset($obj->search)) {
+       watchdog('rtm_views','search not set', NULL);
+       return;
+    }
 
-  $sql = "select o.nid as nid,field_cmte_member_uid as uid,field_office_value as office from rtm_content_field_office o, rtm_content_field_cmte_member m,";
+    if (!isset($obj->parm)) {
+       watchdog('rtm_views','parm not set', NULL);
+       return;
+    }
 
-  if ($search == "c") {
-     $sql .= "rtm_content_field_cmte c ";
-     $sql .= "where m.nid=o.nid and m.vid=o.vid and m.nid=c.nid and m.vid=c.vid and field_cmte_value = '$parm' order by nid";
-  } elseif ($search == "d") {
-     $sql .= "rtm_content_field_district c ";
-     $sql .= "where m.nid=o.nid and m.vid=o.vid and m.nid=c.nid and m.vid=c.vid and field_district_value = '$parm' order by nid";
+  $sql = "select o.nid as nid,r.realname as uid,field_office_value as office from rtm_content_field_office o, ";
+
+  if ($obj->search == "c") {
+     $sql .= "rtm_content_field_cmte c, rtm_content_field_cmte_member m left join rtm_realname r on r.uid=m.field_cmte_member_uid ";
+     $sql .= "where c.vid=o.vid and c.vid=m.vid and c.field_cmte_value = '$obj->parm' order by nid";
+  } elseif ($obj->search == "d") {
+     $sql .= "rtm_content_field_district c, rtm_content_field_cmte_member m left join rtm_realname r on r.uid=m.field_cmte_member_uid ";
+     $sql .= "where m.nid=o.nid and m.vid=o.vid and m.nid=c.nid and m.vid=c.vid and field_district_value = '$obj->parm' order by nid";
   } else {
      die;
   }
 
+//file_put_contents("/tmp/drupal.debug", "_rtm_views_officers_info(): ".$sql."\n\n", FILE_APPEND);
 
   $result = db_query($sql);
 
@@ -255,13 +279,16 @@ function _rtm_views_officers_info($search = NULL, $parm = NULL) {
 
   $obj = new stdClass();
   $obj->matches = $items;
+  $obj->sql = $sql;
+  $obj->parm = $parm;
+  
 
 //$json = drupal_to_js($result->fetchAll());
   header("Content-Type: application/json");
-  print $_GET["callback"];
-  print "(";
+  //print $_GET["callback"];
+  //print "(";
   print json_encode($obj);
-  print ");";
+  //print ");";
 //print_r($items);
   die;
 }

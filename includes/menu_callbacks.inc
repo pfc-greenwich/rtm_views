@@ -25,6 +25,12 @@ function rtm_views_menu() {
       'access arguments' => array('access content'),
    );
 
+   $items['export/gwt/rtm-standing-cmte-list'] = array (
+      'page callback' => '_rtm_views_standing_committee_list',
+      'type' => MENU_CALLBACK,
+      'access arguments' => array('access content'),
+   );
+
    $items['export/gwt/rtm-cmte-members/%'] = array (
       'page callback' => '_rtm_views_committee_members',
       'page arguments' => array(3),
@@ -46,9 +52,8 @@ function rtm_views_menu() {
       'access arguments' => array('access content'),
    );
 
-   $items['export/gwt/officers/%/%'] = array (
+   $items['export/gwt/officers'] = array (
       'page callback' => '_rtm_views_officers_info',
-      'page arguments' => array(3,4),
       'type' => MENU_CALLBACK,
       'access arguments' => array('access content'),
    );
