@@ -45,6 +45,12 @@ function rtm_views_menu() {
       'access arguments' => array('access content'),
    );
 
+   $items['export/gwt/rtm-members-all'] = array (
+      'page callback' => '_rtm_views_members_info_all',
+      'type' => MENU_CALLBACK,
+      'access arguments' => array('access content'),
+   );
+
    $items['export/gwt/rtm-member/%/%'] = array (
       'page callback' => '_rtm_views_members_info',
       'page arguments' => array(3,4),

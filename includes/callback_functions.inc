@@ -30,6 +30,26 @@ function _rtm_views_members($search = NULL) {
   die;
 }
 
+function _rtm_views_members_info_all() {
+  $sql = "select uid,district,lastname,firstname,street_address,zipcode,home_telephone,office_telephone,mobile_telephone,fax,occupation,users_mail";
+  $sql .= " from rtm_all_members_secure order by lastname,firstname";
+
+  $result = db_query($sql);
+
+  $items = array();
+  while ($row = db_fetch_object($result)) {
+#    $row->realname = str_replace("\\"","'", $row->realname);
+#    $row->realname = str_replace("\'","'", $row->realname);
+     array_push($items, $row);
+  }
+  header("Content-Type: application/json");
+  print json_encode($items);
+//print_r($items);
+  die;
+
+}
+
+
 function _rtm_views_members_info($search = NULL, $parm = NULL) {
 
   if (!isset($search)) {
