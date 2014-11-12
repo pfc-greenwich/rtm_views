@@ -31,7 +31,8 @@ function _rtm_views_members($search = NULL) {
 }
 
 function _rtm_views_members_info_all() {
-  $sql = "select uid,district,lastname,firstname,street_address,zipcode,home_telephone,office_telephone,mobile_telephone,fax,occupation,email";
+  $sql = "select uid,district,lastname,firstname,street_address,zipcode,home_telephone,office_telephone,";
+  $sql .= "mobile_telephone,fax,email";
   $sql .= " from rtm_all_members_secure where district > 0 order by lastname,firstname";
 
   $result = db_query($sql);
