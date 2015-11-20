@@ -1,0 +1,38 @@
+<?php
+
+
+$module_path = drupal_get_path('module', 'rtm_views');
+
+include($module_path . '/includes/exposed_form_alters.inc');
+include($module_path . '/includes/menu_callbacks.inc');
+include($module_path . '/includes/callback_functions.inc');
+include($module_path . '/includes/print_mail_form_handling.inc');
+include($module_path . '/includes/theme.inc');
+include($module_path . '/includes/configuration.inc');
+
+function rtm_views_perm() {
+  return array('update rtm committees');
+}
+
+/**
+ * Function to return taxonomy ID based on Committee Name
+ */
+
+function rtm_views_committee_tid($parm = NULL) {
+
+  if (!isset($parm)) {
+     return;
+  }
+
+  $sql = "select tid from rtm_term_data where name='$parm Committee'";
+  $tid = 0;
+
+  $result = db_query($sql);
+
+  $items = array();
+  while ($row = db_fetch_object($result)) {
+     $tid = $row->tid;
+  }
+  return $tid;
+}
+

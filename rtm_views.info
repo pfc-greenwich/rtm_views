@@ -1,0 +1,5 @@
+name = RTM Views and Functions
+description = "Various select lists for RTM Committee views, RTM exports for GWT, RTM Theme Specific Alters"
+dependencies[] = views
+;package = 
+core = 6.x
