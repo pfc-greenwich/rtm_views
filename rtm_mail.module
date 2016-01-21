@@ -66,14 +66,14 @@ function _rtm_mail_message_form() {
     $form['post_msg'] = array(
         '#type' => 'checkbox',
 	'#title' => 'Post this message to the web site',
-	'#value' => FALSE
+	'#default_value' => FALSE
     );
 
     if ($user->uid) {
       $form['copy'] = array(
         '#type' => 'checkbox',
         '#title' => t('Send yourself a copy.'),
-	'#value' => FALSE
+	'#default_value' => FALSE
       );
     }
     else {
