@@ -66,12 +66,14 @@ function _rtm_mail_message_form() {
     $form['post_msg'] = array(
         '#type' => 'checkbox',
 	'#title' => 'Post this message to the web site',
-	'#value' => TRUE
+	'#value' => FALSE
     );
 
     if ($user->uid) {
-      $form['copy'] = array('#type' => 'checkbox',
+      $form['copy'] = array(
+        '#type' => 'checkbox',
         '#title' => t('Send yourself a copy.'),
+	'#value' => FALSE
       );
     }
     else {
@@ -87,8 +89,11 @@ function _rtm_mail_message_form() {
 function _rtm_mail_submit($form, &$form_state) {
   global $user;
   $addrs = _rtm_mail_get_addresses($form_state);
-  $params['msg_text'] = $form_state['values']['message'];
+  $params['msg_text'] = "This E-Mail was sent to the group '" . _rtm_mail_get_single_role($form_state['values']['to_addr']) . "'\n\n";
+  $params['msg_text'] = $params['msg_text'] . $form_state['values']['message'];
   $params['subject'] = $form_state['values']['subject'];
+  $params['headers']['Return-Path'] = "rtm-admin@greenwich.org";
+
   $count = 0;
 
   foreach ($addrs as $addr) {

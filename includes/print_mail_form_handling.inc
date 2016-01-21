@@ -157,6 +157,7 @@ function rtm_views_print_mail_submit($form, &$form_state) {
       $params['message'] = $form_state['values']['txt_message'];
       $params['link'] = $print['url'];
       $params['title'] = $form_state['values']['title'];
+      $params['headers']['Return-Path'] = "rtm-admin@greenwich.org";
 
       $node = $print['node'];
       $params['body'] = theme('print_page', $print, PRINT_MAIL_FORMAT, $node);
