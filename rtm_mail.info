@@ -1,5 +1,0 @@
-name = RTM Mail
-description = "RTM Membership Mailing Functions. To allow certain roles to send e-mails to specific RTM roles."
-dependencies[] = rtm_views
-package = Other
-core = 6.x
